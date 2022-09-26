@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2022 The Tensor2Tensor Authors.
+# Copyright 2020 The Tensor2Tensor Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ python parallel_launch.py \
   --cpu=4 --mem=4 \
   --name=wikisum-refs-web \
   --code_dir=./ \
-  --log_dir=$BUCKET/refs_logs \
+  --logg_dir=$BUCKET/refs_logs \
   --setup_command="pip3 install aiohttp cchardet aiodns bs4 -q --user" \
   --command_prefix="python3 wikisum/get_references_web.py --out_dir=$BUCKET/wiki_references --shard_id"
 ```
@@ -61,7 +61,7 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("num_instances", None, "Number of instances to launch.")
 flags.DEFINE_string("name", None, "Instance name prefix.")
-flags.DEFINE_string("log_dir", None, "GCS bucket to copy logs out to.")
+flags.DEFINE_string("logg_dir", None, "GCS bucket to copy logs out to.")
 flags.DEFINE_string("code_dir", None, "Directory to copy.")
 flags.DEFINE_string("setup_command", None, "Setup command to run.")
 flags.DEFINE_string("command_prefix", None, "Command to run, prefix.")
@@ -86,7 +86,7 @@ DELETE_SELF = ("gcloud compute instances delete $(hostname) --quiet "
 CREATE_INSTANCE = ("gcloud compute instances create {instance_name} "
                    "--custom-cpu {cpu} --custom-memory {mem} "
                    "--custom-extensions "
-                   "--image-project=ml-images --image-family=tf-1-7 "
+                   "--image-project=deeplearning-platform-release --image-family=tf-1-14-cpu "
                    "--scopes=cloud-platform")
 COPY_CODE = "gcloud compute scp --recurse {local_dir} {instance_name}:~/"
 SSH = "gcloud compute ssh {instance_name} --command"
@@ -222,14 +222,14 @@ def main(_):
   pool = mp.Pool(FLAGS.num_threads)
   async_results = []
 
-  assert FLAGS.log_dir
-  log_dir = os.path.join(FLAGS.log_dir, FLAGS.name)
-  tf.gfile.MakeDirs(log_dir)
-  assert log_dir.startswith("gs://")
-  if not log_dir.endswith("/"):
-    log_dir += "/"
+  assert FLAGS.logg_dir
+  logg_dir = os.path.join(FLAGS.logg_dir, FLAGS.name)
+  tf.gfile.MakeDirs(logg_dir)
+  assert logg_dir.startswith("gs://")
+  if not logg_dir.endswith("/"):
+    logg_dir += "/"
   # Write a test file to make sure gcloud GCS APIs are enabled
-  test_filename = os.path.join(log_dir, "check_write")
+  test_filename = os.path.join(logg_dir, "check_write")
   with tf.gfile.Open(test_filename, "w") as f:
     f.write("testing GCS write")
   tf.gfile.Remove(test_filename)
@@ -243,7 +243,7 @@ def main(_):
     instance_name = "%s-%d" % (FLAGS.name, i)
     existing_ip = (vm_info[vm_names.index(instance_name)][1]
                    if instance_name in vm_names else None)
-    logging = LOGS.format(task_id=i, bucket=log_dir) if log_dir else ""
+    logging = LOGS.format(task_id=i, bucket=logg_dir) if logg_dir else ""
     delete = DELETE_SELF.format(zone=zone)
     if FLAGS.debug_keep_up:
       assert len(instance_ids) == 1

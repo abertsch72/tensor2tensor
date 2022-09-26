@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2022 The Tensor2Tensor Authors.
+# Copyright 2020 The Tensor2Tensor Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import datetime
 import gzip
 import os
 import re
-import urllib
+import urllib.request as urllib
 
 import tensorflow.compat.v1 as tf
 
@@ -39,7 +39,7 @@ except ImportError:
 
 # Each entry is a URL to the wet.paths.gz file for that CommonCrawl dump.
 WET_PATHS_BY_DATE = {
-    '0917': ('https://commoncrawl.s3.amazonaws.com/crawl-data/CC-MAIN-2017-39/'
+    '0917': ('https://data.commoncrawl.org/crawl-data/CC-MAIN-2017-39/'
              'wet.paths.gz'),
 }
 
@@ -62,13 +62,14 @@ class WETHeader(collections.namedtuple('WETHeader', ['url', 'length'])):
     """Read header from file. Headers end with length and then 1 blank line."""
     url = None
 
-    line = f.readline()
+    line = str(f.readline())
     if not line:
       # EOF
       return None
-    while not line.startswith(cls.LENGTH_HEADER):
-      if line.startswith(cls.URI_HEADER):
-        url = line[len(cls.URI_HEADER):].strip()
+    print(str(cls.LENGTH_HEADER))
+    while not str(line).startswith(str(cls.LENGTH_HEADER)):
+      if str(line).startswith(str(cls.URI_HEADER)):
+        url = str(line)[len(str(cls.URI_HEADER)):].strip()
       line = f.readline()
 
     # Consume empty separator
@@ -132,8 +133,13 @@ def download(url, download_dir):
   if tf.gfile.Exists(outname):
     print('Found %s, skipping download' % outname)
     return outname
+
   inprogress = outname + '.incomplete'
+  opener = urllib.build_opener()
   print('Downloading %s' % url)
+  headers =  [('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36')]
+  opener.addheaders = headers
+  urllib.install_opener(opener)
   inprogress, _ = urllib.urlretrieve(url, inprogress)
   tf.gfile.Rename(inprogress, outname)
   return outname
@@ -144,7 +150,7 @@ def wet_download_urls(wet_paths_url, tmp_dir, rm_after=True):
   with gzip.open(paths_gz) as f:
     path = f.readline()
     while path:
-      download_path = S3_HTTP_PREFIX + path[:-1]
+      download_path = str(S3_HTTP_PREFIX) + str(path[:-1])
       yield download_path
       path = f.readline()
   if rm_after:

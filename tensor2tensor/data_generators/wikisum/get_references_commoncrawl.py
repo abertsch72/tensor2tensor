@@ -26,10 +26,12 @@ from tensor2tensor.data_generators.wikisum import wikisum
 
 import tensorflow.compat.v1 as tf
 
+
+
 flags = tf.flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_integer("num_tasks", 1000, "Number of parallel tasks.")
+flags.DEFINE_integer("num_tasks", 50, "Number of parallel tasks.")
 flags.DEFINE_integer("task_id", 0, "Task id in a parallel run.")
 flags.DEFINE_string("metadata_dir",
                     "gs://tensor2tensor-data/wikisum/commoncrawl_metadata/",
@@ -41,17 +43,16 @@ flags.DEFINE_string("commoncrawl_wet_dir", None,
                     "provided, will download.")
 
 
-def main(_):
-  assert FLAGS.out_dir
-  assert FLAGS.metadata_dir
-  out_dir = os.path.join(FLAGS.out_dir, "process_%d" % FLAGS.task_id)
+def main(task_id, out_dir, metadata_dir="gs://tensor2tensor-data/wikisum/commoncrawl_metadata/", num_tasks=50, commoncrawl_wet_dir=None):
+
+  out_dir = os.path.join(out_dir, "process_%d" % task_id)
   tf.gfile.MakeDirs(out_dir)
 
   with utils.timing("get_refs_commoncrawl"):
     # Get all WET files
-    if FLAGS.commoncrawl_wet_dir:
+    if commoncrawl_wet_dir:
       wet_files = tf.gfile.Glob(
-          os.path.join(FLAGS.commoncrawl_wet_dir, "*.wet.gz"))
+          os.path.join(commoncrawl_wet_dir, "*.wet.gz"))
     else:
       tmp_dir = tempfile.gettempdir()
       wet_files = list(
@@ -59,12 +60,16 @@ def main(_):
 
     # Shard and select this task's work
     wet_files.sort()
-    wet_files = utils.shard(wet_files, FLAGS.num_tasks)[FLAGS.task_id]
+    wet_files = utils.shard(wet_files, num_tasks)[task_id]
     tf.logging.info("Sharded out WET files. Processing %d files",
                     len(wet_files))
 
-    wikisum.extract_references_from_wets(wet_files, FLAGS.metadata_dir, out_dir)
+    wikisum.extract_references_from_wets(wet_files, metadata_dir, out_dir)
 
+
+def call(id, out_dir):
+  tf.logging.set_verbosity(tf.logging.INFO)
+  main(id, out_dir)
 
 if __name__ == "__main__":
   tf.logging.set_verbosity(tf.logging.INFO)

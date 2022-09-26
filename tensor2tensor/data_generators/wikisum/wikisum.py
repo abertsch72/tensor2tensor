@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2022 The Tensor2Tensor Authors.
+# Copyright 2020 The Tensor2Tensor Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -511,6 +511,8 @@ def extract_references_from_wets(wet_files, metadata_dir, out_dir,
 
   num_refs = 0
   for i, wet_file in enumerate(wet_files):
+    wet_file = wet_file.replace("'", "")
+    wet_file = wet_file.replace("commoncrawl.s3.amazonaws.com/b", "data.commoncrawl.org/")
     num_refs_in_wet = 0
     tf.logging.info("Processing file %d", i)
 
@@ -535,6 +537,7 @@ def extract_references_from_wets(wet_files, metadata_dir, out_dir,
           cc_utils.gzip_memfile(wet_file), take_ownership=True)
 
     for wet_record in record_gen:
+      print(wet_record)
       shard_ids = wet_metadata.get(wet_record.url)
       if not shard_ids:
         # URL not in dataset
