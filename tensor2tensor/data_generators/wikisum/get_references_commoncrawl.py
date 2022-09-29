@@ -43,7 +43,7 @@ flags.DEFINE_string("commoncrawl_wet_dir", None,
                     "provided, will download.")
 
 
-def main(task_id, out_dir, metadata_dir="gs://tensor2tensor-data/wikisum/commoncrawl_metadata/", num_tasks=50, commoncrawl_wet_dir=None):
+def main(task_id, out_dir, metadata_dir="gs://tensor2tensor-data/wikisum/commoncrawl_metadata/", num_tasks=1000, commoncrawl_wet_dir=None):
 
   out_dir = os.path.join(out_dir, "process_%d" % task_id)
   tf.gfile.MakeDirs(out_dir)
@@ -54,7 +54,9 @@ def main(task_id, out_dir, metadata_dir="gs://tensor2tensor-data/wikisum/commonc
       wet_files = tf.gfile.Glob(
           os.path.join(commoncrawl_wet_dir, "*.wet.gz"))
     else:
-      tmp_dir = tempfile.gettempdir()
+      tmp_dir = tempfile.gettempdir() + "/" +  str(task_id)
+      if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
       wet_files = list(
           utils.wet_download_urls(utils.WET_PATHS_BY_DATE["0917"], tmp_dir))
 
