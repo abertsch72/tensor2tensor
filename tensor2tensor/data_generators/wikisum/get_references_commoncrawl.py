@@ -43,7 +43,7 @@ flags.DEFINE_string("commoncrawl_wet_dir", "outputs/wet_dir",
                     "provided, will download.")
 
 
-def main(task_id, out_dir, metadata_dir="gs://tensor2tensor-data/wikisum/commoncrawl_metadata/", num_tasks=1000, commoncrawl_wet_dir=None):
+def main(task_id, out_dir, metadata_dir="outputs/commoncrawl_metadata/", num_tasks=1000, commoncrawl_wet_dir=None):
 
   out_dir = os.path.join(out_dir, "process_%d" % task_id)
   tf.gfile.MakeDirs(out_dir)
