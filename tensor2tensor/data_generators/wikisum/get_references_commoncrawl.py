@@ -38,12 +38,12 @@ flags.DEFINE_string("metadata_dir",
                     "Path to metadata files specifying what references are in "
                     "which CommonCrawl files.")
 flags.DEFINE_string("out_dir", None, "Directory to write references to.")
-flags.DEFINE_string("commoncrawl_wet_dir", "outputs/wet_dir",
+flags.DEFINE_string("commoncrawl_wet_dir", "outputs/wet_dir/",
                     "Path to CommonCrawl wet.gz files locally. If not "
                     "provided, will download.")
 
 
-def main(task_id, out_dir, metadata_dir="outputs/commoncrawl_metadata/", num_tasks=1000, commoncrawl_wet_dir=None):
+def main(task_id, out_dir, metadata_dir="gs://tensor2tensor-data/wikisum/commoncrawl_metadata/", num_tasks=1000, commoncrawl_wet_dir="outputs/wet_dir/"):
 
   out_dir = os.path.join(out_dir, "process_%d" % task_id)
   tf.gfile.MakeDirs(out_dir)
@@ -59,6 +59,8 @@ def main(task_id, out_dir, metadata_dir="outputs/commoncrawl_metadata/", num_tas
         os.mkdir(tmp_dir)
       wet_files = list(
           utils.wet_download_urls(utils.WET_PATHS_BY_DATE["0917"], tmp_dir))
+    
+    wet_files = [commoncrawl_wet_dir + u.strip().split("/")[-1] for u in open("outputs/wet.paths").readlines()]
 
     # Shard and select this task's work
     wet_files.sort()

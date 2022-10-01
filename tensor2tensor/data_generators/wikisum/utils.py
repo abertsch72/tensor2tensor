@@ -207,9 +207,11 @@ def shard(items, num_shards):
 
 
 def gzip_memfile(fname):
-  with tf.gfile.Open(readahead(fname)) as f:
-    memfile = StringIO.StringIO(f.read())
-  return gzip.GzipFile(fileobj=memfile)
+  print(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!{fname}")
+  #with tf.gfile.Open(readahead(fname)) as f:
+  #  memfile = StringIO.StringIO(f.read())
+  return gzip.open(fname)
+  #return gzip.GzipFile(fileobj=open(fname), mode='rb')
 
 
 _SOME_ALPHA_RE = re.compile(r'[A-Za-z]+')
