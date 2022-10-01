@@ -62,15 +62,14 @@ class WETHeader(collections.namedtuple('WETHeader', ['url', 'length'])):
     """Read header from file. Headers end with length and then 1 blank line."""
     url = None
 
-    line = str(f.readline())
+    line = str(f.readline().decode('utf-8'))
     if not line:
       # EOF
       return None
-    print(str(cls.LENGTH_HEADER))
     while not str(line).startswith(str(cls.LENGTH_HEADER)):
       if str(line).startswith(str(cls.URI_HEADER)):
         url = str(line)[len(str(cls.URI_HEADER)):].strip()
-      line = f.readline()
+      line = f.readline().decode('utf-8')
 
     # Consume empty separator
     f.readline()

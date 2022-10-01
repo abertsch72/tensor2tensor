@@ -21,8 +21,8 @@ from __future__ import print_function
 import os
 import tempfile
 
-from tensor2tensor.data_generators.wikisum import utils
-from tensor2tensor.data_generators.wikisum import wikisum
+import utils
+import wikisum
 
 import tensorflow.compat.v1 as tf
 
@@ -38,7 +38,7 @@ flags.DEFINE_string("metadata_dir",
                     "Path to metadata files specifying what references are in "
                     "which CommonCrawl files.")
 flags.DEFINE_string("out_dir", None, "Directory to write references to.")
-flags.DEFINE_string("commoncrawl_wet_dir", None,
+flags.DEFINE_string("commoncrawl_wet_dir", "outputs/wet_dir",
                     "Path to CommonCrawl wet.gz files locally. If not "
                     "provided, will download.")
 

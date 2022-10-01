@@ -15,7 +15,7 @@ end = int(sys.argv[2])
 num_tasks = 1000
 
 command = "python3 get_references_commoncrawl.py --task_id "
-from multiprocessing import Process, Lock, Pool, cpu_count
+from multiprocessing import Process, Lock, Pool, cpu_count, get_context
 
 
 from timeit import default_timer as timer
@@ -23,11 +23,15 @@ from timeit import default_timer as timer
 from get_references_commoncrawl import call
 
 def f(i, outdir="outputs/wiki_references"):
-    sleeptime = random.randint(0,20) # stagger downloads 
-    time.sleep(sleeptime)
+    sleeptime = random.randint(1000000,20000000) # stagger downloads 
+    s = 0
+    for j in range(sleeptime):
+        s += j
+        s -= j
     try:
         call(i, outdir)
-    except:
+    except Exception as e:
+        print(e)
         print("error in process " + str(i))
         time.sleep(100)
         print("NOTE: retrying " + str(i))
@@ -38,21 +42,20 @@ if __name__ == '__main__':
 
     proc = []
     indices = list(range(start, end))
-    start = timer()
+    start_time = timer()
 
     print(f'starting computations on {cpu_count()} cores')
 
-    with Pool() as pool:
+    with get_context("spawn").Pool(cpu_count() * 2) as pool:
         pool.map(f, indices)
-    end = timer()
-    print(f'elapsed time: {end - start}')
 
     """
     for num in range(start,end):
         p = Process(target=f, args=(num,))
         p.start()
-        p.join()
+        #p.join()
         proc.append(p)
-        if num % 5 == 0:
-            time.sleep(20) 
+    print(len(proc))
+    end_time = timer()
+    print(f'elapsed time: {end - start}')
     """

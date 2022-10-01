@@ -220,7 +220,7 @@ def _truncate_to_lead_section(example):
 def _make_example_from_record(record):
   features = {
       "url":
-          tf.train.Feature(bytes_list=tf.train.BytesList(value=[record.url])),
+          tf.train.Feature(bytes_list=tf.train.BytesList(value=[record.url.encode('utf-8')])),
       "content":
           tf.train.Feature(
               bytes_list=tf.train.BytesList(value=[record.content])),
@@ -537,7 +537,6 @@ def extract_references_from_wets(wet_files, metadata_dir, out_dir,
           cc_utils.gzip_memfile(wet_file), take_ownership=True)
 
     for wet_record in record_gen:
-      print(wet_record)
       shard_ids = wet_metadata.get(wet_record.url)
       if not shard_ids:
         # URL not in dataset
