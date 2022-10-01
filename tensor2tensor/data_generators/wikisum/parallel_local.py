@@ -32,8 +32,7 @@ def f(i, outdir="outputs/wiki_references"):
         call(i, outdir)
     except EOFError as e:
         print(e)
-        print("error in process " + str(i))
-        time.sleep(100)
+        print("FILE error in process " + str(i))
         #print("NOTE: retrying " + str(i))
         #f(i, outdir)
 

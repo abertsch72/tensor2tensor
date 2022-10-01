@@ -51,8 +51,8 @@ for url in urls:
     #print(url)
     if not url or url[0] == "#":
         continue
-    if os.path.exists(filename):
-        pass#continue
+    if os.path.exists(filename) and os.path.getsize(filename) > 1000:
+        continue
     queue.append((url, filename))
 
 
