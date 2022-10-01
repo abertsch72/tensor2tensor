@@ -37,5 +37,5 @@ for shard in represented:
 
 print(represented)
 print(complete)
-for f in fill_partial:
-    print(f)
+#for f in fill_partial:
+#    print(f)

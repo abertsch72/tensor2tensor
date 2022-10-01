@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     proc = []
 
-    indices = [97, 120, 119, 111]
+    indices = list(range(25,50))
 
     start_time = timer()
 
