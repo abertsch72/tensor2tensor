@@ -4,18 +4,6 @@ wetlist = "outputs/wet.paths"
 filelist = open(wetlist).readlines()
 outputdir = "outputs/wet_dir/"
 
-"""
-for file in filelist:
-    outname = output_dir + file
-    webname = prefix + file
-
-    with open('outname', 'wb') as f:
-        c = pycurl.Curl()
-        c.setopt(c.URL, webname)
-        c.setopt(c.WRITEDATA, f)
-        c.perform()
-        c.close()
-"""
 
 #! /usr/bin/env python
 # -*- coding: iso-8859-1 -*-
@@ -64,7 +52,7 @@ for url in urls:
     if not url or url[0] == "#":
         continue
     if os.path.exists(filename):
-        continue
+        pass#continue
     queue.append((url, filename))
 
 

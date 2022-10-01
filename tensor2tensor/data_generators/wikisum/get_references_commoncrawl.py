@@ -60,10 +60,11 @@ def main(task_id, out_dir, metadata_dir="gs://tensor2tensor-data/wikisum/commonc
       wet_files = list(
           utils.wet_download_urls(utils.WET_PATHS_BY_DATE["0917"], tmp_dir))
     
-    wet_files = [commoncrawl_wet_dir + u.strip().split("/")[-1] for u in open("outputs/wet.paths").readlines()]
+    wet_files = [u.strip() for u in open("outputs/wet.paths").readlines()]
 
     # Shard and select this task's work
     wet_files.sort()
+    wet_files = [commoncrawl_wet_dir + "/" + w.split("/")[-1] for w in wet_files]
     wet_files = utils.shard(wet_files, num_tasks)[task_id]
     tf.logging.info("Sharded out WET files. Processing %d files",
                     len(wet_files))

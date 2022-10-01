@@ -28,26 +28,27 @@ def f(i, outdir="outputs/wiki_references"):
     for j in range(sleeptime):
         s += j
         s -= j
-    call(i,outdir)
     try:
         call(i, outdir)
-    except Exception as e:
+    except EOFError as e:
         print(e)
         print("error in process " + str(i))
         time.sleep(100)
-        print("NOTE: retrying " + str(i))
-        f(i, outdir)
+        #print("NOTE: retrying " + str(i))
+        #f(i, outdir)
 
     
 if __name__ == '__main__':
 
     proc = []
-    indices = [101, 109, 98, 110, 117, 104, 114, 116, 99, 112, 106, 111, 102, 107, 103, 113, 108, 118, 115, 105, 100] #list(range(start, end))
+
+    indices = [97, 120, 119, 111]
+
     start_time = timer()
 
     print(f'starting computations on {cpu_count()} cores')
 
-    with get_context("spawn").Pool(cpu_count() - 2) as pool:
+    with get_context("spawn").Pool(int(cpu_count() / 2)) as pool:
         pool.map(f, indices)
 
     """
@@ -60,3 +61,15 @@ if __name__ == '__main__':
     end_time = timer()
     print(f'elapsed time: {end - start}')
     """
+
+def distribute(indices, half=True):
+    print(f'starting computations on {cpu_count()} cores')
+    poolsize = cpu_count()
+    if half:
+        poolsize = int(poolsize / 2)
+    start_time = timer()
+    with get_context("spawn").Pool(poolsize) as pool:
+        pool.map(f, indices)
+    end_time = timer()
+    print(f'elapsed time: {end - start}')
+
