@@ -20,6 +20,12 @@ def check():
         if complete:
            completed.append(int(proc.strip(prefix)))
 
+    this_machine = completed
+    print()
+    print(this_machine)
+    print(len(this_machine))
+
+
     completed.extend(prior)
     completed = sorted(list(set(completed)))
     with open("completed.pkl", "wb") as f:
